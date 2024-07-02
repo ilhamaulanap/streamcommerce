@@ -1,0 +1,7 @@
+credentials/
+.terraform/
+credentials/*
+
+.ssh/*
+.terraform.lock.hcl
+terraform.tfstate**
