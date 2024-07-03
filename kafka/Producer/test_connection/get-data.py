@@ -4,7 +4,7 @@ import time
 from confluent_kafka import SerializingProducer
 from datetime import datetime
 
-api_key = '55df03be-e10b-42ac-ba79-d481b2739f9d'
+api_key = ''
 url = f'http://api.airvisual.com/v2/countries?key={api_key}'
 
 
@@ -46,7 +46,7 @@ def main(url):
                              on_delivery=delivery_report
                              )
             producer.poll(0)
-            time.sleep(5)
+            time.sleep(10)
         except BufferError:
             print("buffer full! waiting....")
             time.sleep(1)
