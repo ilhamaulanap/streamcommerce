@@ -10,8 +10,8 @@ RUN apt-get update && \
 COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy data_ingestion.py
-COPY get_data.py get_data.py
+# Copy get-data.py
+COPY get-data.py get-data.py
 
 # Set the entry point
-ENTRYPOINT [ "python", "get_data.py" ]
+ENTRYPOINT [ "python", "get-data.py" ]
