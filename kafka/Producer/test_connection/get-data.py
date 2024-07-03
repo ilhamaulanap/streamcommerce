@@ -33,9 +33,9 @@ def main(url):
     
     producer = SerializingProducer ({'bootstrap.servers': 'localhost:9092'})
 
-    curr_time = datetime.now()
 
-    while (datetime.now() - curr_time).seconds < 120:
+
+    while True:
         try:
             weather_data = fetch_weather_data(url)
 
