@@ -64,6 +64,8 @@ def delivery_report(err, msg):
         print(f"Message delivered to {msg.topic} [{msg.partition()}]")
 
 def main():
+
+    #kafka topics
     transactions_topic = 'financial_transactions'
     feedback_topic = 'customer_feedback'
     views_topic = 'product_views'

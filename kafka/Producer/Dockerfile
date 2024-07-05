@@ -11,7 +11,7 @@ COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy data_ingestion.py
-COPY data_ingestion.py data_ingestion.py
+COPY producer_sales_data.py producer_sales_data.py
 
 # Set the entry point
-ENTRYPOINT [ "python", "producer.py" ]
+ENTRYPOINT [ "python", "producer_sales_data.py" ]
