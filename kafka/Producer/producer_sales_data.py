@@ -123,8 +123,8 @@ def main():
                              )
             producer.poll(0)
 
-            # Wait for 5 seconds before sending the next set of data
-            time.sleep(5)
+            # Wait for 10 seconds before sending the next set of data
+            time.sleep(10)
         except BufferError:
             print("Transaction buffer full! Waiting...")
             time.sleep(1)

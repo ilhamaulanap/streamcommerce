@@ -1,3 +1,2 @@
 confluent-kafka==2.3.0
-faker
-requests
+Faker
