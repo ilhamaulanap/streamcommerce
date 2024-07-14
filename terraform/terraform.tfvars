@@ -6,7 +6,8 @@ gcs_bucket     = "streamcommerce_202407"
 gcs_bucket_location     = "ASIA"
 
 gcp_project               = "black-machine-422712-b7"
-gcp_region                = "asia-southeast1 "
+gcp_region                = "asia-southeast1"
+gcp_zone                  = "asia-southeast1-b"
 
 compute_instance_image    = "ubuntu-os-cloud/ubuntu-2004-lts"
 
@@ -17,6 +18,12 @@ kafka_port              = "9092"
 kafka_control_port      = "9021"
 kafka_disk_size         = 50
 
+dataproc_instance_name = "streamcommerce-spark-cluster"
+dataproc_instance_master_type = "e2-standard-2"
+dataproc_master_boot_disk = 50
+dataproc_instance_worker_type = "e2-standard-2"
+dataproc_worker_boot_disk = 50
+dataproc_instance_image = "2.2-debian12"
 
 stg_bq_dataset = "staging_streamcommerce"
 prod_bq_dataset = "prod_streamcommerce"

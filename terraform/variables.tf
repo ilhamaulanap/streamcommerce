@@ -19,6 +19,11 @@ variable "gcs_bucket" {
   type        = string
 }
 
+variable "gcp_zone" {
+  description = "The GCP zone for resources"
+  type        = string
+}
+
 variable "gcs_bucket_location" {
   description = "The location of the GCS bucket for terraform backend"
   type        = string
@@ -59,7 +64,37 @@ variable "compute_instance_image" {
   description = "The image for the Compute Engine instance"
   type        = string
 }
- 
+
+variable "dataproc_instance_name" {
+  description = "The name of the dataproc cluster Engine instance"
+  type        = string
+}
+
+variable "dataproc_instance_master_type" {
+  description = "The machine type of the dataproc cluster master node instance"
+  type        = string
+}
+
+variable "dataproc_master_boot_disk" {
+  description = "The disk size of the dataproc cluster master node instance"
+  type        = number
+}
+
+variable "dataproc_instance_worker_type" {
+  description = "The machine type of the dataproc cluster worker node instance"
+  type        = string
+}
+
+variable "dataproc_worker_boot_disk" {
+  description = "The disk size of the dataproc cluster worker node instance"
+  type        = number
+}
+
+variable "dataproc_instance_image" {
+  description = "The image of the dataproc cluster instance"
+  type        = string
+}
+
 variable "network" {
   description = "Network for your instance/cluster"
   default     = "default"
