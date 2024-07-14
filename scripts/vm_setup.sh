@@ -12,3 +12,6 @@ sudo service docker restart
 echo "Cloning git repository"
 git clone https://github.com/ilhamaulanap/streamcommerce.git
 
+echo "Install requirements.txt"
+pip install --no-cache-dir -r streamcommerce/requirements.txt
+
