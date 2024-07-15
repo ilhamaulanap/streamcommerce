@@ -24,8 +24,7 @@ traffic_topic = 'website_traffic'
 output_path = "gs://streamcommerce_202407/events_data/"
 checkpoints_path = f"{output_path}checkpoints/"
 
-# Define ingestion time format
-ingestion_time_format = 'yyyy-MM-dd HH:mm:ss'
+
 
 transaction_schema = StructType([
     StructField("transactionId", StringType(), nullable=False),
@@ -40,7 +39,6 @@ transaction_schema = StructType([
     StructField("transactionDate", TimestampType(), nullable=False),
     StructField("paymentMethod", StringType(), nullable=False),
     StructField("totalAmount", DoubleType(), nullable=False),
-    StructField("ingestion_time", TimestampType(), nullable=False),  # Added ingestion_time
 ])
 
 # Schema for customer_feedback topic
@@ -51,7 +49,6 @@ feedback_schema = StructType([
     StructField("rating", IntegerType(), nullable=False),
     StructField("comment", StringType(), nullable=False),
     StructField("feedbackDate", TimestampType(), nullable=False),
-    StructField("ingestion_time", TimestampType(), nullable=False),  # Added ingestion_time
 ])
 
 # Schema for product_views topic
@@ -59,7 +56,6 @@ view_schema = StructType([
     StructField("productId", StringType(), nullable=False),
     StructField("viewCount", IntegerType(), nullable=False),
     StructField("lastViewed", TimestampType(), nullable=False),
-    StructField("ingestion_time", TimestampType(), nullable=False),  # Added ingestion_time
 ])
 
 # Schema for website_traffic topic
@@ -67,7 +63,6 @@ traffic_schema = StructType([
     StructField("pageUrl", StringType(), nullable=False),
     StructField("visitCount", IntegerType(), nullable=False),
     StructField("lastVisit", TimestampType(), nullable=False),
-    StructField("ingestion_time", TimestampType(), nullable=False),  # Added ingestion_time
 ])
 
 
@@ -80,13 +75,14 @@ def load_data_with_quality_check(topic, schema):
             .option("subscribe", topic) \
             .option("startingOffsets", "earliest") \
             .load() \
-            .selectExpr("CAST(value AS STRING)", "CAST(timestamp AS TIMESTAMP) as ingestion_time") \
-            .select(from_json(col("value"), schema).alias("data"), col("ingestion_time")) \
-            .select("data.*", col("ingestion_time").alias("ingestion_timestamp")) \
-            .withColumn("year", year("ingestion_timestamp")) \
-            .withColumn("month", month("ingestion_timestamp")) \
-            .withColumn("day", dayofmonth("ingestion_timestamp")) \
-            .withColumn("hour", hour("ingestion_timestamp"))
+            .selectExpr("CAST(value AS STRING)") \
+            .select(from_json(col("value"), schema).alias("data")) \
+            .select("data.*") \
+            .withColumn("ingestion_time", current_timestamp()) \
+            .withColumn("year", year("ingestion_time")) \
+            .withColumn("month", month("ingestion_time")) \
+            .withColumn("day", dayofmonth("ingestion_time")) \
+            .withColumn("hour", hour("ingestion_time"))
     except Exception as e:
         logger.error(f"Error loading data from topic {topic}: {e}")
 
