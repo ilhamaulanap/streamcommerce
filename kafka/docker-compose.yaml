@@ -1,4 +1,3 @@
-#1.0.01
 version: '3'
 
 services:
@@ -18,6 +17,8 @@ services:
       retries: 5
     networks:
       - confluent
+    volumes:
+      - zookeeper_data:/var/lib/zookeeper/data
 
   broker:
     image: confluentinc/cp-server:latest
@@ -54,6 +55,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    volumes:
+      - kafka_data:/var/lib/kafka/data
 
   schema-registry:
     image: confluentinc/cp-schema-registry:latest
@@ -99,6 +102,10 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+
+volumes:
+  zookeeper_data:
+  kafka_data:
 
 networks:
   confluent:
