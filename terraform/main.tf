@@ -46,7 +46,7 @@ resource "google_dataproc_cluster" "mulitnode_spark_cluster" {
   name   = var.dataproc_instance_name
   region = var.gcp_region
 
-  cluster_config {
+  cluster_config { 
 
     staging_bucket = var.gcs_bucket
 

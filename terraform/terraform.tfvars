@@ -23,7 +23,7 @@ dataproc_instance_master_type = "e2-standard-2"
 dataproc_master_boot_disk = 50
 dataproc_instance_worker_type = "e2-standard-2"
 dataproc_worker_boot_disk = 50
-dataproc_instance_image = "2.2-debian12"
+dataproc_instance_image = "2.1-debian11"
 
 stg_bq_dataset = "staging_streamcommerce"
 prod_bq_dataset = "prod_streamcommerce"
