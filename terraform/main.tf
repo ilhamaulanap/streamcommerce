@@ -82,7 +82,6 @@ resource "google_dataproc_cluster" "mulitnode_spark_cluster" {
       override_properties = {
         "dataproc:dataproc.allow.zero.workers" = "true"
       }
-      optional_components = ["JUPYTER"]
     }
 
   }
