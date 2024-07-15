@@ -7,7 +7,7 @@ export SPARK_HOME=/usr/lib/spark
 
 # Fetch PySpark file from GitHub
 echo "Fetching PySpark file from GitHub..."
-wget -O stream_events_data.py https://github.com/ilhamaulanap/streamcommerce/blob/3fe9d32682a07986d63f4ee56ca195e6f7894d6c/spark_streaming/test_connection/get-data-from-kafka.py
+wget -O get-data-from-data.py https://github.com/ilhamaulanap/streamcommerce/blob/3fe9d32682a07986d63f4ee56ca195e6f7894d6c/spark_streaming/test_connection/get-data-from-kafka.py
 
 # Submit PySpark job using spark-submit
 echo "Submitting PySpark job..."
