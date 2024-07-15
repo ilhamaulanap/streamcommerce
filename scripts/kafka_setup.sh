@@ -14,4 +14,5 @@ echo "Running Kafka using docker-compose"
 cd streamcommerce/kafka
 
 # Start Kafka and Zookeeper containers
+echo "Running Kafka using docker-compose"
 docker-compose up -d
