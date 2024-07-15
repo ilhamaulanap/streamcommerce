@@ -82,14 +82,15 @@ def load_data_with_quality_check(topic, schema):
             .load() \
             .selectExpr("CAST(value AS STRING)", "CAST(timestamp AS TIMESTAMP) as ingestion_time") \
             .select(from_json(col("value"), schema).alias("data"), col("ingestion_time")) \
-            .select("data.*", "ingestion_time") \
-            .withColumn("year", year("ingestion_time")) \
-            .withColumn("month", month("ingestion_time")) \
-            .withColumn("day", dayofmonth("ingestion_time")) \
-            .withColumn("hour", hour("ingestion_time")) \
-            .withColumn("minute", minute("ingestion_time"))
+            .select("data.*", col("ingestion_time").alias("ingestion_timestamp")) \
+            .withColumn("year", year("ingestion_timestamp")) \
+            .withColumn("month", month("ingestion_timestamp")) \
+            .withColumn("day", dayofmonth("ingestion_timestamp")) \
+            .withColumn("hour", hour("ingestion_timestamp")) \
+            .withColumn("minute", minute("ingestion_timestamp"))
     except Exception as e:
         logger.error(f"Error loading data from topic {topic}: {e}")
+
 
 
 # Write data to GCS with ingestion_time and error handling
