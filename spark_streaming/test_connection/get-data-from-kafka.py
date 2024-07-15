@@ -1,9 +1,8 @@
-# kafka_consumer.py
 
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
 
-KAFKA_ADDRESS = '34.143.189.53'
+KAFKA_ADDRESS = "34.143.189.53"
 
 # Create a Spark session
 spark = SparkSession.builder \

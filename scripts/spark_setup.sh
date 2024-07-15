@@ -7,13 +7,13 @@ export SPARK_HOME=/usr/lib/spark
 
 # Fetch PySpark file from GitHub
 echo "Fetching PySpark file from GitHub..."
-wget -O my_pyspark_job.py https://raw.githubusercontent.com/your-username/your-repo/main/your_pyspark_file.py
+wget -O stream_events_data.py https://github.com/ilhamaulanap/streamcommerce/blob/3fe9d32682a07986d63f4ee56ca195e6f7894d6c/spark_streaming/test_connection/get-data-from-kafka.py
 
 # Submit PySpark job using spark-submit
 echo "Submitting PySpark job..."
 nohup spark-submit \
-  --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0 \
-stream_all_events.py \
+  --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.3.2 \
+    stream_events_data.py \
 > nohup.out 2>&1 &
 
 
