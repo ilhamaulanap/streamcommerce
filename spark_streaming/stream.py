@@ -37,6 +37,7 @@ def load_data_with_quality_check(topic, schema):
             .format("kafka") \
             .option("kafka.bootstrap.servers", kafka_server) \
             .option("subscribe", topic) \
+            .option("startingOffsets", "earliest") \
             .load() \
             .selectExpr("CAST(value AS STRING)", "CAST(timestamp AS TIMESTAMP) as ingestion_time") \
             .select(from_json(col("value"), schema).alias("data"), col("ingestion_time")) \
@@ -48,6 +49,7 @@ def load_data_with_quality_check(topic, schema):
             .withColumn("minute", minute("ingestion_time"))
     except Exception as e:
         logger.error(f"Error loading data from topic {topic}: {e}")
+
 
 # Write data to GCS with ingestion_time and error handling
 def write_to_gcs(df, topic, output_path):
