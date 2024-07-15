@@ -86,8 +86,7 @@ def load_data_with_quality_check(topic, schema):
             .withColumn("year", year("ingestion_timestamp")) \
             .withColumn("month", month("ingestion_timestamp")) \
             .withColumn("day", dayofmonth("ingestion_timestamp")) \
-            .withColumn("hour", hour("ingestion_timestamp")) \
-            .withColumn("minute", minute("ingestion_timestamp"))
+            .withColumn("hour", hour("ingestion_timestamp"))
     except Exception as e:
         logger.error(f"Error loading data from topic {topic}: {e}")
 
@@ -101,7 +100,7 @@ def write_to_gcs(df, topic, output_path):
             .format("parquet") \
             .option("path", output_path + topic) \
             .option("checkpointLocation", f"{checkpoints_path}{topic}") \
-            .partitionBy("year", "month", "day", "hour", "minute") \
+            .partitionBy("year", "month", "day", "hour") \
             .start()
         return query
     except Exception as e:
