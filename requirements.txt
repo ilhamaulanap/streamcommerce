@@ -1,4 +1,0 @@
-confluent-kafka==2.4.0
-Faker==26.0.0
-kafka-python
-dbt-bigquery
