@@ -42,6 +42,26 @@ resource "google_compute_instance" "kafka_instance" {
   }
 }
 
+resource "google_compute_instance" "airflowdbt_instance" {
+  name         = var.airflow_instance_name
+  machine_type = var.airflow_instance_type
+  zone         = var.airflow_instance_zone
+
+  boot_disk {
+    initialize_params {
+      size = var.airflow_disk_size
+      image = var.compute_instance_image
+    }
+  }
+
+  network_interface {
+    network = "default"
+    access_config {
+      // This will create an external IP address for the instance
+    }
+  }
+}
+
 resource "google_dataproc_cluster" "mulitnode_spark_cluster" {
   name   = var.dataproc_instance_name
   region = var.gcp_region
@@ -66,14 +86,6 @@ resource "google_dataproc_cluster" "mulitnode_spark_cluster" {
       disk_config {
         boot_disk_type    = "pd-ssd"
         boot_disk_size_gb = var.dataproc_master_boot_disk
-      }
-    }
-
-    worker_config {
-      num_instances = 2
-      machine_type  = var.dataproc_instance_worker_type
-      disk_config {
-        boot_disk_size_gb = var.dataproc_worker_boot_disk
       }
     }
 
@@ -108,7 +120,7 @@ resource "google_compute_firewall" "kafka_port_rules" {
   project     = var.gcp_project
   name        = "kafka-control"
   network     = var.network
-  description = "Opens port 9092 in the Kafka VM"
+  description = "Opens port 9021 in the Kafka VM"
 
   allow {
     protocol = "tcp"
@@ -117,6 +129,22 @@ resource "google_compute_firewall" "kafka_port_rules" {
 
   source_ranges = ["0.0.0.0/0"]
 }
+
+resource "google_compute_firewall" "airflow_port_rules" {
+  project     = var.gcp_project
+  name        = "airflow-webserver"
+  network     = var.network
+  description = "Opens port 8080 in the Airflow VM"
+
+  allow {
+    protocol = "tcp"
+    ports    = [var.airflow_webserver_port]
+  }
+
+  source_ranges = ["0.0.0.0/0"]
+}
+
+
 
 resource "google_compute_firewall" "allow_http" {
   project     = var.gcp_project

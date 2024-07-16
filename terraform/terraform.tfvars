@@ -18,11 +18,16 @@ kafka_port              = "9092"
 kafka_control_port      = "9021"
 kafka_disk_size         = 50
 
+airflow_instance_name     = "streamcommerce-airflow"
+airflow_instance_type     = "e2-standard-2"
+airflow_instance_zone     = "asia-southeast1-b"
+airflow_webserver_port    = "8080"
+airflow_disk_size         = 50
+
+
 dataproc_instance_name = "streamcommerce-spark-cluster"
-dataproc_instance_master_type = "e2-standard-2"
+dataproc_instance_master_type = "e2-highmem-2"
 dataproc_master_boot_disk = 50
-dataproc_instance_worker_type = "e2-standard-2"
-dataproc_worker_boot_disk = 50
 dataproc_instance_image = "2.1-debian11"
 
 stg_bq_dataset = "staging_streamcommerce"

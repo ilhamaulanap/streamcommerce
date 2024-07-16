@@ -60,6 +60,31 @@ variable "kafka_control_port" {
   type = string
 }
 
+variable "airflow_instance_name" {
+  description = "The name of the airflow VM Engine instance"
+  type        = string
+}
+
+variable "airflow_instance_type" {
+  description = "The machine type of the airflow VM Engine instance"
+  type        = string
+}
+
+variable "airflow_instance_zone" {
+  description = "The zone of the airflow VM Engine instance"
+  type        = string
+}
+
+variable "airflow_disk_size" {
+  description = "The airflow VM engine disk size"
+  type      = number
+}
+
+variable "airflow_webserver_port" {
+  description = "kafka ports"
+  type = string
+}
+
 variable "compute_instance_image" {
   description = "The image for the Compute Engine instance"
   type        = string
@@ -77,16 +102,6 @@ variable "dataproc_instance_master_type" {
 
 variable "dataproc_master_boot_disk" {
   description = "The disk size of the dataproc cluster master node instance"
-  type        = number
-}
-
-variable "dataproc_instance_worker_type" {
-  description = "The machine type of the dataproc cluster worker node instance"
-  type        = string
-}
-
-variable "dataproc_worker_boot_disk" {
-  description = "The disk size of the dataproc cluster worker node instance"
   type        = number
 }
 
