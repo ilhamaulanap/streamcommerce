@@ -2,7 +2,7 @@ echo "Running sudo apt-get update..."
 sudo apt-get update
 
 echo "Installing Docker..."
-sudo apt-get -y install docker.io python3-pip
+sudo apt-get -y install docker.io python3-pip docker-compose
 
 echo "Docker without sudo setup..."
 sudo groupadd docker
