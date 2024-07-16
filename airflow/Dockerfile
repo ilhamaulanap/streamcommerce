@@ -1,3 +1,4 @@
+
 FROM apache/airflow:latest
 
 # Switch to root to install system dependencies
@@ -12,9 +13,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Copy requirements file
 COPY requirements.txt /requirements.txt
 
-# Switch to the airflow user before running pip
-USER airflow
-
 # Install python dependencies
-RUN pip install --user --upgrade pip \
-    && pip install --user -r /requirements.txt
+RUN pip install --upgrade pip \
+    && pip install -r /requirements.txt
+
+# Switch to airflow user
+USER airflow
