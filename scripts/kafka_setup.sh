@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Install Kafka requirements.txt
+echo "Install Kafka requirements.txt"
+pip install --no-cache-dir -r streamcommerce/kafka/requirements.txt
+
 # Fetch external IP address using metadata server
 EXTERNAL_IP=$(curl -s -H "Metadata-Flavor: Google" http://metadata/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip)
 
@@ -14,5 +18,20 @@ echo "Running Kafka using docker-compose"
 cd streamcommerce/kafka
 
 # Start Kafka and Zookeeper containers
-echo "Running Kafka using docker-compose"
+echo "Starting Kafka using docker-compose"
 docker-compose up -d
+
+# Wait for Kafka containers to be healthy
+echo "Waiting for Kafka containers to be healthy..."
+docker-compose ps kafka | grep "healthy"
+while [ $? -ne 0 ]; do
+    sleep 5
+    docker-compose ps kafka | grep "healthy"
+done
+
+# Run Python script in the background with nohup
+echo "Running Python script in the background with nohup"
+nohup python3 producer_sales_data.py > output.log 2>&1 &
+
+
+echo "All processes started"
