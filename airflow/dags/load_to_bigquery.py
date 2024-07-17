@@ -31,43 +31,38 @@ GCS_BASE_PATH = 'events_data/'
 BQ_PROJECT_ID = 'black-machine-422712-b7'
 BQ_STAGING_DATASET_NAME = 'staging_streamcommerce'
 
-# List of tables to delete
-tables_to_delete = ['views', 'transactions', 'traffic', 'feedback']
+# List of tables to delete and load
+tables_to_process = ['views', 'transactions', 'traffic', 'feedback']
 
-# Function to create BigQueryDeleteTableOperator tasks
-def create_delete_table_task(table_name):
-    return BigQueryDeleteTableOperator(
+# Function to create delete and load tasks for each table
+def create_delete_and_load_tasks(table_name):
+    # Delete table task
+    delete_task = BigQueryDeleteTableOperator(
         task_id=f'delete_{table_name}_table',
         deletion_dataset_table=f'{BQ_PROJECT_ID}.{BQ_STAGING_DATASET_NAME}.{table_name}',
         ignore_if_missing=True,
         dag=dag,
     )
-
-# Create deletion tasks for each table
-delete_table_tasks = [create_delete_table_task(table) for table in tables_to_delete]
-
-# Function to create GCSToBigQueryOperator tasks
-def create_gcs_to_bq_task(data_type):
-    return GCSToBigQueryOperator(
-        task_id=f'load_{data_type}_to_bq',
+    
+    # Load from GCS to BigQuery task
+    load_task = GCSToBigQueryOperator(
+        task_id=f'load_{table_name}_to_bq',
         bucket=GCS_BUCKET_NAME,
-        source_objects=[f'{GCS_BASE_PATH}{data_type}/year=*/month=*/day=*/hour=*/file*.parquet'],
-        destination_project_dataset_table=f'{BQ_PROJECT_ID}.{BQ_STAGING_DATASET_NAME}.{data_type}',
+        source_objects=[f'{GCS_BASE_PATH}{table_name}/year=*/month=*/day=*/hour=*/file*.parquet'],
+        destination_project_dataset_table=f'{BQ_PROJECT_ID}.{BQ_STAGING_DATASET_NAME}.{table_name}',
         source_format='PARQUET',
         write_disposition='WRITE_TRUNCATE',  # Replace existing data
         create_disposition='CREATE_IF_NEEDED',  # Create table if it does not exist
         dag=dag,
     )
+    
+    # Set task dependencies
+    delete_task >> load_task
+    
+    return delete_task, load_task
 
-# List of data types
-data_types = ['views', 'transactions', 'traffic', 'feedback']
-
-# Create tasks for each data type
-gcs_to_bq_tasks = [create_gcs_to_bq_task(data_type) for data_type in data_types]
-
-# Set up task dependencies
-for delete_task in delete_table_tasks:
-    delete_task >> gcs_to_bq_tasks
+# Create tasks for each table
+delete_and_load_tasks = [create_delete_and_load_tasks(table) for table in tables_to_process]
 
 # Print DAG structure for verification
 print(dag)
