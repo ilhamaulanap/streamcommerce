@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from airflow import DAG
-from airflow.providers.google.cloud.operators.bigquery import BigQueryExecuteQueryOperator, BigQueryDeleteTableOperator
+from airflow.providers.google.cloud.operators.bigquery import BigQueryDeleteTableOperator
 from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
 
 # Default arguments for the DAG
@@ -34,19 +34,17 @@ BQ_STAGING_DATASET_NAME = 'staging_streamcommerce'
 # List of tables to delete
 tables_to_delete = ['views', 'transactions', 'traffic', 'feedback']
 
-# Construct deletion dataset table IDs
-deletion_dataset_tables = [f'{BQ_PROJECT_ID}.{BQ_STAGING_DATASET_NAME}.{table}' for table in tables_to_delete]
+# Function to create BigQueryDeleteTableOperator tasks
+def create_delete_table_task(table_name):
+    return BigQueryDeleteTableOperator(
+        task_id=f'delete_{table_name}_table',
+        deletion_dataset_table=f'{BQ_PROJECT_ID}.{BQ_STAGING_DATASET_NAME}.{table_name}',
+        ignore_if_missing=True,
+        dag=dag,
+    )
 
-# Task to delete existing staging tables (if needed)
-delete_staging_tables = BigQueryDeleteTableOperator(
-    task_id='delete_staging_tables',
-    deletion_dataset_table=deletion_dataset_tables,
-    ignore_if_missing=True,
-    dag=dag,
-)
-
-# List of data types
-data_types = ['views', 'transactions', 'traffic', 'feedback']
+# Create deletion tasks for each table
+delete_table_tasks = [create_delete_table_task(table) for table in tables_to_delete]
 
 # Function to create GCSToBigQueryOperator tasks
 def create_gcs_to_bq_task(data_type):
@@ -56,13 +54,20 @@ def create_gcs_to_bq_task(data_type):
         source_objects=[f'{GCS_BASE_PATH}{data_type}/year=*/month=*/day=*/hour=*/file*.parquet'],
         destination_project_dataset_table=f'{BQ_PROJECT_ID}.{BQ_STAGING_DATASET_NAME}.{data_type}',
         source_format='PARQUET',
-        write_disposition='WRITE_TRUNCATE',
-        create_disposition='CREATE_IF_NEEDED',
+        write_disposition='WRITE_TRUNCATE',  # Replace existing data
+        create_disposition='CREATE_IF_NEEDED',  # Create table if it does not exist
         dag=dag,
     )
+
+# List of data types
+data_types = ['views', 'transactions', 'traffic', 'feedback']
 
 # Create tasks for each data type
 gcs_to_bq_tasks = [create_gcs_to_bq_task(data_type) for data_type in data_types]
 
 # Set up task dependencies
-delete_staging_tables >> gcs_to_bq_tasks
+for delete_task in delete_table_tasks:
+    delete_task >> gcs_to_bq_tasks
+
+# Print DAG structure for verification
+print(dag)
