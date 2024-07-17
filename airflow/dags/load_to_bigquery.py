@@ -31,11 +31,16 @@ GCS_BASE_PATH = 'events_data/'
 BQ_PROJECT_ID = 'black-machine-422712-b7'
 BQ_STAGING_DATASET_NAME = 'staging_streamcommerce'
 
-# Task to delete existing staging tables (if needed)
+# List of tables to delete
 tables_to_delete = ['views', 'transactions', 'traffic', 'feedback']
+
+# Construct deletion dataset table IDs
+deletion_dataset_tables = [f'{BQ_PROJECT_ID}.{BQ_STAGING_DATASET_NAME}.{table}' for table in tables_to_delete]
+
+# Task to delete existing staging tables (if needed)
 delete_staging_tables = BigQueryDeleteTableOperator(
     task_id='delete_staging_tables',
-    deletion_dataset_table=[f'{BQ_PROJECT_ID}.{BQ_STAGING_DATASET_NAME}.{table}' for table in tables_to_delete],
+    deletion_dataset_table=deletion_dataset_tables,
     ignore_if_missing=True,
     dag=dag,
 )
