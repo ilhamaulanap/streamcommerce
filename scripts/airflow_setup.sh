@@ -1,4 +1,5 @@
 #!/bin/bash
+#!/bin/bash
 
 echo "Running sudo apt-get update..."
 sudo apt-get update

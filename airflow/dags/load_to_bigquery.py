@@ -32,12 +32,11 @@ BQ_PROJECT_ID = 'black-machine-422712-b7'
 BQ_STAGING_DATASET_NAME = 'staging_streamcommerce'
 
 # Task to delete existing staging tables (if needed)
+tables_to_delete = ['views', 'transactions', 'traffic', 'feedback']
 delete_staging_tables = BigQueryDeleteTableOperator(
     task_id='delete_staging_tables',
-    project_id=BQ_PROJECT_ID,
-    dataset_id=BQ_STAGING_DATASET_NAME,
-    table_id=['views', 'transactions', 'traffic', 'feedback'],  # Delete all staging tables
-    ignore_if_missing=True,  # Ignore if tables do not exist
+    deletion_dataset_table=[f'{BQ_PROJECT_ID}.{BQ_STAGING_DATASET_NAME}.{table}' for table in tables_to_delete],
+    ignore_if_missing=True,
     dag=dag,
 )
 
@@ -52,8 +51,8 @@ def create_gcs_to_bq_task(data_type):
         source_objects=[f'{GCS_BASE_PATH}{data_type}/year=*/month=*/day=*/hour=*/file*.parquet'],
         destination_project_dataset_table=f'{BQ_PROJECT_ID}.{BQ_STAGING_DATASET_NAME}.{data_type}',
         source_format='PARQUET',
-        write_disposition='WRITE_TRUNCATE',  # Replace existing data
-        create_disposition='CREATE_IF_NEEDED',  # Create table if it does not exist
+        write_disposition='WRITE_TRUNCATE',
+        create_disposition='CREATE_IF_NEEDED',
         dag=dag,
     )
 
