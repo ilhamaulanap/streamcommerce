@@ -1,4 +1,4 @@
-transaction_schema = [
+transactions_schema = [
     {"name": "transactionId", "type": "STRING", "mode": "NULLABLE"},
     {"name": "productId", "type": "STRING", "mode": "NULLABLE"},
     {"name": "productName", "type": "STRING", "mode": "NULLABLE"},

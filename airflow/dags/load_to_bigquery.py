@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.providers.google.cloud.operators.bigquery import BigQueryCreateExternalTableOperator
-from schemas.schemas import transaction_schema, traffic_schema, feedback_schema, views_schema  
+from schemas.schemas import transactions_schema, traffic_schema, feedback_schema, views_schema  
 
 
 # Default arguments for the DAG
