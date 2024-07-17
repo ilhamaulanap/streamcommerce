@@ -39,7 +39,7 @@ def create_external_table_tasks(table_name):
     external_table_task = BigQueryCreateExternalTableOperator(
         task_id=f'update_external_{table_name}_table_hourly',
         bucket=GCS_BUCKET_NAME,
-        source_objects=[f'{GCS_BUCKET_NAME}/{GCS_BASE_PATH}/{table_name}/*.parquet'],  # Adjust source path here
+        source_objects=[f'{GCS_BASE_PATH}/{table_name}/*.parquet'],  # Adjust source path here
         destination_project_dataset_table=f'{BQ_PROJECT_ID}.{BQ_STAGING_DATASET_NAME}.{table_name}',
         source_format='PARQUET',
         dag=dag,
