@@ -23,8 +23,8 @@ dag = DAG(
 )
 
 # GCS bucket and base file path
-GCS_BUCKET_NAME = 'streamcommerce_202407'
-GCS_BASE_PATH = 'events_data/'
+GCS_BUCKET_NAME = 'streamcommerce_202407_update'
+GCS_BASE_PATH = 'events_data'
 
 # BigQuery project and dataset
 BQ_PROJECT_ID = 'black-machine-422712-b7'
@@ -39,7 +39,7 @@ def create_external_table_tasks(table_name):
     external_table_task = BigQueryCreateExternalTableOperator(
         task_id=f'update_external_{table_name}_table_hourly',
         bucket=GCS_BUCKET_NAME,
-        source_objects=[f'{GCS_BASE_PATH}/{table_name}/*.parquet'],  # Adjust source path here
+        source_objects=[f'{GCS_BUCKET_NAME}/{GCS_BASE_PATH}/{table_name}/*.parquet'],  # Adjust source path here
         destination_project_dataset_table=f'{BQ_PROJECT_ID}.{BQ_STAGING_DATASET_NAME}.{table_name}',
         schema_fields=[],  # Specify schema fields if known, otherwise let BigQuery infer schema
         source_format='PARQUET',
