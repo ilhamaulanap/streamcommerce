@@ -14,7 +14,7 @@ default_args = {
 
 # Define the DAG
 dag = DAG(
-    'update_external_tables_hourly',
+    'load_external_table_bigquery',
     default_args=default_args,
     description='Update external tables in BigQuery hourly as new data arrives in GCS',
     schedule_interval='@hourly',  # Run every hour
@@ -41,7 +41,6 @@ def create_external_table_tasks(table_name):
         bucket=GCS_BUCKET_NAME,
         source_objects=[f'{GCS_BUCKET_NAME}/{GCS_BASE_PATH}/{table_name}/*.parquet'],  # Adjust source path here
         destination_project_dataset_table=f'{BQ_PROJECT_ID}.{BQ_STAGING_DATASET_NAME}.{table_name}',
-        schema_fields=[],  # Specify schema fields if known, otherwise let BigQuery infer schema
         source_format='PARQUET',
         dag=dag,
     )
