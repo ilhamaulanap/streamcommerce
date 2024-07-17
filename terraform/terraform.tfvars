@@ -2,8 +2,8 @@
 #Backend for terraform 
 #backend_bucket          = "kafka-terraform-state-backend-202402"
 
-gcs_bucket     = "streamcommerce_202407"
-gcs_bucket_location     = "ASIA"
+gcs_bucket     = "streamcommerce_202407_update"
+gcs_bucket_location     = "US"
 
 gcp_project               = "black-machine-422712-b7"
 gcp_region                = "asia-southeast1"

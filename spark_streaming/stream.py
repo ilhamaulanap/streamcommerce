@@ -21,7 +21,7 @@ views_topic = 'product_views'
 traffic_topic = 'website_traffic'
 
 # Define GCS output path and checkpoints path
-output_path = "gs://streamcommerce_202407/events_data/"
+output_path = "gs://streamcommerce_202407_update/events_data/"
 checkpoints_path = f"{output_path}checkpoints/"
 
 
