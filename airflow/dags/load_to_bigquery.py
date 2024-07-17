@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.providers.google.cloud.operators.bigquery import BigQueryCreateExternalTableOperator
+from schemas.schemas import transaction_schema, traffic_schema, feedback_schema, views_schema  
+
 
 # Default arguments for the DAG
 default_args = {
@@ -35,6 +37,7 @@ tables_to_process = ['views', 'transactions', 'traffic', 'feedback']
 
 # Function to create tasks for defining or updating external tables
 def create_external_table_tasks(table_name):
+    schema = globals()[f'{table_name}_schema']
     # Create or update external table task
     external_table_task = BigQueryCreateExternalTableOperator(
         task_id=f'update_external_{table_name}_table_hourly',
@@ -42,14 +45,14 @@ def create_external_table_tasks(table_name):
         source_objects=[f'{GCS_BASE_PATH}/{table_name}/*.parquet'],  # Adjust source path here
         destination_project_dataset_table=f'{BQ_PROJECT_ID}.{BQ_STAGING_DATASET_NAME}.{table_name}',
         source_format='PARQUET',
-        autodetect=True,
+        schema_fields=schema,
         dag=dag,
     )
     
     return external_table_task
 
 # Create tasks for each table to define or update external tables
-external_table_tasks = [create_external_table_tasks(table_name) for table_name in tables_to_process]
+external_table_tasks = [create_external_table_tasks(table_name) for table_name in tables_to_process ]
 
 # Set dependencies for external table tasks
 for external_table_task in external_table_tasks:
