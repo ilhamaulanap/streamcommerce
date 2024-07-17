@@ -14,7 +14,7 @@ default_args = {
 
 # Define the DAG
 dag = DAG(
-    'load_external_table_bigquery',
+    'load_external_table_to_bigquery',
     default_args=default_args,
     description='Update external tables in BigQuery hourly as new data arrives in GCS',
     schedule_interval='@hourly',  # Run every hour
@@ -48,7 +48,7 @@ def create_external_table_tasks(table_name):
     return external_table_task
 
 # Create tasks for each table to define or update external tables
-external_table_tasks = [create_external_table_tasks(table) for table in tables_to_process]
+external_table_tasks = [create_external_table_tasks(table_name) for table_name in tables_to_process]
 
 # Set dependencies for external table tasks
 for external_table_task in external_table_tasks:
