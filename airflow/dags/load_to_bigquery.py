@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 from airflow import DAG
-from airflow.providers.google.cloud.operators.bigquery import BigQueryDeleteTableOperator
-from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
+from airflow.providers.google.cloud.operators.bigquery import BigQueryCreateExternalTableOperator
 
 # Default arguments for the DAG
 default_args = {
@@ -15,10 +14,10 @@ default_args = {
 
 # Define the DAG
 dag = DAG(
-    'load_data_to_staging_dataset',
+    'batch_load_to_external_tables',
     default_args=default_args,
-    description='Load data from GCS to staging tables in BigQuery',
-    schedule_interval='*/10 * * * *',  # Run every 10 minutes
+    description='Batch load data into external tables in BigQuery every hour',
+    schedule_interval='@hourly',  # Run every hour
     start_date=datetime(2023, 1, 1),
     catchup=False,
 )
@@ -31,38 +30,32 @@ GCS_BASE_PATH = 'events_data/'
 BQ_PROJECT_ID = 'black-machine-422712-b7'
 BQ_STAGING_DATASET_NAME = 'staging_streamcommerce'
 
-# List of tables to delete and load
+# List of tables to process
 tables_to_process = ['views', 'transactions', 'traffic', 'feedback']
 
-# Function to create delete and load tasks for each table
-def create_delete_and_load_tasks(table_name):
-    # Delete table task
-    delete_task = BigQueryDeleteTableOperator(
-        task_id=f'delete_{table_name}_table',
-        deletion_dataset_table=f'{BQ_PROJECT_ID}.{BQ_STAGING_DATASET_NAME}.{table_name}',
-        ignore_if_missing=True,
-        dag=dag,
-    )
-    
-    # Load from GCS to BigQuery task
-    load_task = GCSToBigQueryOperator(
-        task_id=f'load_{table_name}_to_bq',
+# Function to create tasks for defining or updating external tables
+def create_external_table_tasks(table_name):
+    # Create or update external table task
+    external_table_task = BigQueryCreateExternalTableOperator(
+        task_id=f'create_external_{table_name}_table',
         bucket=GCS_BUCKET_NAME,
-        source_objects=[f'{GCS_BASE_PATH}{table_name}/year=*/month=*/day=*/hour=*/file*.parquet'],
+        source_objects=[f'{GCS_BASE_PATH}{table_name}/*.parquet'],  # Adjust source path here
         destination_project_dataset_table=f'{BQ_PROJECT_ID}.{BQ_STAGING_DATASET_NAME}.{table_name}',
+        schema_fields=[],  # Specify schema fields if known, otherwise let BigQuery infer schema
         source_format='PARQUET',
-        write_disposition='WRITE_TRUNCATE',  # Replace existing data
+        write_disposition='WRITE_TRUNCATE',  # Replace existing table if it exists
         create_disposition='CREATE_IF_NEEDED',  # Create table if it does not exist
         dag=dag,
     )
     
-    # Set task dependencies
-    delete_task >> load_task
-    
-    return delete_task, load_task
+    return external_table_task
 
-# Create tasks for each table
-delete_and_load_tasks = [create_delete_and_load_tasks(table) for table in tables_to_process]
+# Create tasks for each table to define or update external tables
+external_table_tasks = [create_external_table_tasks(table) for table in tables_to_process]
+
+# Set dependencies for external table tasks
+for external_table_task in external_table_tasks:
+    external_table_task
 
 # Print DAG structure for verification
 print(dag)
