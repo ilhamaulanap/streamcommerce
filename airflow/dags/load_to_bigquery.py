@@ -1,8 +1,19 @@
 from datetime import datetime, timedelta
 from airflow import DAG
-from airflow.providers.google.cloud.operators.bigquery import BigQueryCreateExternalTableOperator
 from schemas.schemas import transactions_schema, traffic_schema, feedback_schema, views_schema  
+from task_functions import create_external_table, create_empty_table, insert_bq
 
+
+# GCS bucket and base file path
+GCS_BUCKET_NAME = 'streamcommerce_202407_update'
+GCS_BASE_PATH = 'events_data'
+
+# BigQuery project and dataset
+BQ_PROJECT_ID = 'black-machine-422712-b7'
+BQ_STAGING_DATASET_NAME = 'staging_streamcommerce'
+
+# List of EVENTS to process
+EVENTS = ['views', 'transactions', 'traffic', 'feedback']
 
 # Default arguments for the DAG
 default_args = {
@@ -15,48 +26,41 @@ default_args = {
 }
 
 # Define the DAG
-dag = DAG(
-    'load_external_table_to_bigquery',
+with DAG(
+    'load_to_bigquery',
     default_args=default_args,
-    description='Update external tables in BigQuery hourly as new data arrives in GCS',
-    schedule_interval='@hourly',  # Run every hour
+    description='Load to bigquery from gcs',
+    schedule_interval='*/10 * * * *',  # Run every 10 minute
     start_date=datetime(2023, 1, 1),
     catchup=False,
-)
+) as dag:
 
-# GCS bucket and base file path
-GCS_BUCKET_NAME = 'streamcommerce_202407_update'
-GCS_BASE_PATH = 'events_data'
+    for EVENT in EVENTS:
+        
+        BQ_STAGING_TABLE_NAME = EVENT
+        INSERT_QUERY = f"{{% include 'sql/{EVENT}.sql' %}}" 
+        GCS_EVENT_PATH = f'{GCS_BASE_PATH}/{EVENT}/*.parquet'
+        BQ_DATASET_EXTERNAL_TABLE = f'{BQ_PROJECT_ID}.{BQ_STAGING_DATASET_NAME}.{EVENT}_external'
+        SCHEMA = globals()[f'{EVENT}_schema']
+        
 
-# BigQuery project and dataset
-BQ_PROJECT_ID = 'black-machine-422712-b7'
-BQ_STAGING_DATASET_NAME = 'staging_streamcommerce'
+        create_external_table_task = create_external_table(EVENT,
+                                                            GCS_BUCKET_NAME, 
+                                                            GCS_EVENT_PATH, 
+                                                            BQ_DATASET_EXTERNAL_TABLE,  
+                                                            SCHEMA)
+        
+        create_empty_table_task = create_empty_table(EVENT,
+                                                        BQ_STAGING_DATASET_NAME,
+                                                        BQ_STAGING_TABLE_NAME,
+                                                        BQ_PROJECT_ID,
+                                                        SCHEMA)
+                                                
+        execute_insert_query_task = insert_bq(EVENT,
+                                                INSERT_QUERY)
 
-# List of tables to process
-tables_to_process = ['views', 'transactions', 'traffic', 'feedback']
 
-# Function to create tasks for defining or updating external tables
-def create_external_table_tasks(table_name):
-    schema = globals()[f'{table_name}_schema']
-    # Create or update external table task
-    external_table_task = BigQueryCreateExternalTableOperator(
-        task_id=f'update_external_{table_name}_table_hourly',
-        bucket=GCS_BUCKET_NAME,
-        source_objects=[f'{GCS_BASE_PATH}/{table_name}/*.parquet'],  # Adjust source path here
-        destination_project_dataset_table=f'{BQ_PROJECT_ID}.{BQ_STAGING_DATASET_NAME}.{table_name}',
-        source_format='PARQUET',
-        schema_fields=schema,
-        dag=dag,
-    )
-    
-    return external_table_task
+create_external_table_task >> \
+create_empty_table_task >> \
+execute_insert_query_task
 
-# Create tasks for each table to define or update external tables
-external_table_tasks = [create_external_table_tasks(table_name) for table_name in tables_to_process ]
-
-# Set dependencies for external table tasks
-for external_table_task in external_table_tasks:
-    external_table_task
-
-# Print DAG structure for verification
-print(dag)
