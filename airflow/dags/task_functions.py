@@ -6,14 +6,14 @@ from airflow.providers.google.cloud.operators.bigquery import (BigQueryCreateExt
 
 def create_external_table(EVENT,
                           GCS_BUCKET_NAME, 
-                          GCS_EVENT_PATH, 
+                          GCS_BASE_PATH, 
                           BQ_DATASET_EXTERNAL_TABLE,  
                           SCHEMA):
 
     task = BigQueryCreateExternalTableOperator(
         task_id=f'create_external_{EVENT}_table',
         bucket=GCS_BUCKET_NAME,
-        source_objects=GCS_EVENT_PATH,  # Adjust source path here
+        source_objects=f'{GCS_BASE_PATH}/{EVENT}/*.parquet',  # Adjust source path here
         destination_project_dataset_table=BQ_DATASET_EXTERNAL_TABLE,
         source_format='PARQUET',
         schema_fields=SCHEMA

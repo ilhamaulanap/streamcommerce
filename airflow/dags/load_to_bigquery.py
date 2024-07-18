@@ -39,14 +39,13 @@ with DAG(
         
         BQ_STAGING_TABLE_NAME = EVENT
         INSERT_QUERY = f"{{% include 'sql/{EVENT}.sql' %}}" 
-        GCS_EVENT_PATH = f'{GCS_BASE_PATH}/{EVENT}/*.parquet'
         BQ_DATASET_EXTERNAL_TABLE = f'{BQ_PROJECT_ID}.{BQ_STAGING_DATASET_NAME}.{EVENT}_external'
         SCHEMA = globals()[f'{EVENT}_schema']
         
 
         create_external_table_task = create_external_table(EVENT,
                                                             GCS_BUCKET_NAME, 
-                                                            GCS_EVENT_PATH, 
+                                                            GCS_BASE_PATH, 
                                                             BQ_DATASET_EXTERNAL_TABLE,  
                                                             SCHEMA)
         
