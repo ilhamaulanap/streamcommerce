@@ -13,7 +13,7 @@ def create_external_table(EVENT,
     task = BigQueryCreateExternalTableOperator(
         task_id=f'create_external_{EVENT}_table',
         bucket=GCS_BUCKET_NAME,
-        source_objects=f'{GCS_BASE_PATH}/{EVENT}/*.parquet',  # Adjust source path here
+        source_objects=[f'{GCS_BASE_PATH}/{EVENT}/*.parquet'],  # Adjust source path here
         destination_project_dataset_table=BQ_DATASET_EXTERNAL_TABLE,
         source_format='PARQUET',
         schema_fields=SCHEMA
