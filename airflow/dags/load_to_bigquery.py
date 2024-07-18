@@ -60,7 +60,7 @@ with DAG(
                                                 INSERT_QUERY)
 
 
-create_external_table_task >> \
-create_empty_table_task >> \
-execute_insert_query_task
+        create_external_table_task >> \
+        create_empty_table_task >> \
+        execute_insert_query_task
 
