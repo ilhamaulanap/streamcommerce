@@ -15,6 +15,9 @@ sudo service docker restart
 echo "Cloning git repository"
 git clone https://github.com/ilhamaulanap/streamcommerce.git
 
+echo "Changing permissions for dbt folder..."
+cd ~/streamcommerce/ && sudo chmod -R 777 dbt
+
 
 # Change directory to where your docker-compose.yml is located
 echo "Running Airflow using docker-compose"
