@@ -22,4 +22,6 @@ streamcommerce:
       threads: 4
       timeout_seconds: 300
       type: bigquery
+      vars:
+        prod_dataset: "prod_streamcommerce"
   target: dev
