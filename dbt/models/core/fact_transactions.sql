@@ -1,10 +1,8 @@
 -- models/fact_transactions.sql
 
 {{ config(
-    schema=var('prod_dataset'),  
-    materialized='table'  
+    materialized='table' 
 ) }}
-
 select
     transactionId as transaction_id,
     productId as product_id,

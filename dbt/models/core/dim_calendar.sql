@@ -1,8 +1,7 @@
 -- models/dim_time.sql
 
 {{ config(
-    schema=var('prod_dataset'),  
-    materialized='table'  
+    materialized='table' 
 ) }}
 
 with time_data as (

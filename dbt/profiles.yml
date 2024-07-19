@@ -4,7 +4,7 @@ streamcommerce:
       dataset: staging_streamcommerce
       fixed_retries: 1
       keyfile: /.google/credentials/google_credentials.json
-      location: us-central1
+      location: US
       method: service-account
       priority: interactive
       project: black-machine-422712-b7
@@ -15,13 +15,11 @@ streamcommerce:
       dataset: prod_streamcommerce
       fixed_retries: 1
       keyfile: /.google/credentials/google_credentials.json
-      location: us-central1
+      location: US
       method: service-account
       priority: interactive
       project: black-machine-422712-b7
       threads: 4
       timeout_seconds: 300
       type: bigquery
-      vars:
-        prod_dataset: "prod_streamcommerce"
   target: dev

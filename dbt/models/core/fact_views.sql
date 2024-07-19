@@ -1,8 +1,7 @@
 -- models/fact_page_views.sql
 
 {{ config(
-    schema=var('prod_dataset'),  
-    materialized='table'  
+    materialized='table' 
 ) }}
 
 select
