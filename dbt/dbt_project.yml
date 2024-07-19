@@ -29,7 +29,6 @@ models:
       +materialized: ephemeral  # Do not materialize staging models
     core:
       +materialized: table
-      +schema: "{{ var('prod_dataset') }}"  # Use production dataset specified in vars
 
 # Define variables
 vars:

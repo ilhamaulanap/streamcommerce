@@ -1,5 +1,5 @@
 {{ config(
-    schema=var('prod_dataset')
+    schema=var('prod_dataset'),
     materialized='table'  
 ) }}
 
