@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from airflow import DAG
+from airflow.operators.bash import BashOperator
 from schemas.schemas import transactions_schema, traffic_schema, feedback_schema, views_schema  
 from task_functions import create_external_table, create_empty_table, insert_bq
 
@@ -35,6 +36,18 @@ with DAG(
     catchup=False,
 ) as dag:
 
+    initiate_dbt_task = BashOperator(
+        task_id='dbt_initiate',
+        bash_command='cd /dbt && dbt deps --profiles-dir . --target prod'
+    )
+
+
+    execute_dbt_task = BashOperator(
+        task_id = 'dbt_run',
+        bash_command = 'cd /dbt && dbt deps && dbt run --profiles-dir . --target prod'
+    )
+
+
     for EVENT in EVENTS:
         
         BQ_STAGING_TABLE_NAME = EVENT
@@ -57,9 +70,12 @@ with DAG(
                                                 
         execute_insert_query_task = insert_bq(EVENT,
                                                 INSERT_QUERY)
+    
 
 
         create_external_table_task >> \
         create_empty_table_task >> \
-        execute_insert_query_task
+        execute_insert_query_task >> \
+        initiate_dbt_task >> \
+        execute_dbt_task
 
