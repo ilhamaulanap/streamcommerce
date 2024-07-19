@@ -1,0 +1,11 @@
+version: 2
+
+sources:
+    - name: staging
+      database: black-machine-422712-b7
+      schema: staging_streamcommerce
+      tables:
+        - name: feedback
+        - name: transactions
+        - name: traffic
+        - name: views
